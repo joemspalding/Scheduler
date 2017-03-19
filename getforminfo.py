@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+import ast
 
 url = "https://htmlaccess.louisville.edu/classSchedule/setupSearchClassSchedule.cfm?error=1"
 
@@ -16,9 +17,8 @@ dataTerm = []
 
 #creating a pseudo JSON object
 for t in childTerm:
-    temp = '{' + "'value' : {}, 'name' : '{}'".format(t['value'],t.text) + '}'
-    print temp
-    dataTerm.append(temp)
+    temp = "{" + "'value' : {}, 'name' : '{}'".format(t['value'], t.text) + "}"
+    dataTerm.append(ast.literal_eval(temp))
 
 #getting all the subjects from the drop down list
 subject = soup.find(attrs={"name" : "subject"})
@@ -27,17 +27,15 @@ dataSubject = []
 
 #creating a pseudo JSON object
 for s in childSubject:
-    temp = '{' + "'value' : '{}', 'name' : '{}'".format(s['value'],s.text) + '}'
-    print temp
-    dataSubject.append(temp)
+    temp = "{" + '"value" : "{}", "name" : "{}"'.format(s['value'], s.text) + "}"
+    dataSubject.append(ast.literal_eval(temp))
+else:
 
-print dataTerm
-print dataSubject
 
-with open('dataTerm.txt', 'w') as outTerm:
+with open('dataTerm.json', 'w') as outTerm:
     json.dump(dataTerm, outTerm)
 
-with open('dataSubject.txt', 'w') as outSubject:
+with open('dataSubject.json', 'w') as outSubject:
     json.dump(dataSubject, outSubject)
 
-
+print "All data processed into JSON files"
